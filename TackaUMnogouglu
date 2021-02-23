@@ -1,0 +1,104 @@
+#include<stdio.h>
+#include<math.h>
+
+typedef enum  {KOLINEARNE,NEGATIVNA_ORJ,POZITIVNA_ORJ} orij;
+typedef struct
+{
+    int x,y;
+}Tacka;
+
+orij orijentacija(Tacka A, Tacka B, Tacka C){
+    int d = (B.x-A.x)*(C.y-A.y) - (C.x-A.x)*(B.y-A.y);
+    if (d == 0)
+        return KOLINEARNE;
+    else
+        if (d > 0)
+            return POZITIVNA_ORJ;
+        else
+            return NEGATIVNA_ORJ;
+}
+
+int pripadaDuzi(Tacka P, Tacka Q, Tacka R){
+    if (Q.x <= fmax(P.x, R.x) && Q.x >= fmin(P.x, R.x) &&
+        Q.y <= fmax(P.y, R.y) && Q.y >= fmin(P.y, R.y))
+            return 1;
+    return 0;
+}
+
+
+int sekuSe(Tacka P1, Tacka Q1, Tacka P2, Tacka Q2){
+// racunamo vrednosti cetiri orijentacije
+// koje su nam potrebne
+    orij o1 = orijentacija(P1, Q1, P2);
+    orij o2 = orijentacija(P1, Q1, Q2);
+    orij o3 = orijentacija(P2, Q2, P1);
+    orij o4 = orijentacija(P2, Q2, Q1);
+    //prvi slucaj
+    if(o1 != o2 && o3 != o4)
+    return 1;
+    // P1, P2 i Q1 su kolinearne i P2 pripada duzi P1Q1
+    if (o1 == KOLINEARNE && pripadaDuzi(P1, P2, Q1))
+        return 1;
+    // P1, Q1 i Q2 su kolinearne i Q2 pripada duzi P1Q1
+    if (o2 == KOLINEARNE && pripadaDuzi(P1, Q2, Q1))
+        return 1;
+    // P2, Q2 i P1 su kolinearne i P1 pripada duzi P2Q2
+    if (o3 == KOLINEARNE && pripadaDuzi(P2, P1, Q2))
+        return 1;
+    // P2, Q2 i P1 su kolinearne i Q1 pripada duzi P2Q2
+    if (o4 == KOLINEARNE && pripadaDuzi(P2, Q1, Q2))
+        return 1;
+    // inace se duzi ne seku
+    return 0;
+}
+
+int tackaUMnogouglu(Tacka M[], Tacka A,int n)
+{
+  // Nije mnogougao ako ima manje od 3 tacke.
+  if (n < 3)
+    return 0;
+    // "ne" predstavlja tacku koja ima najmanju vrednost y-a i sluzi pravljenju duzi AA1.
+    int ne;
+    for(int k = 0; k < n; k++)
+     {
+       if(ne < M[k].y) ne = M[k].y;
+        
+     }
+
+     // Poseban slucaj kada je A.y = A1.y, tada A ne pripada mnogouglu jer 
+     // nalazi na stranici mnogougla.
+    if(A.y == ne) 
+    return -1;
+
+   //Tacka sa kojom A pravi duz koja je paralelna sa y osom.
+   Tacka A1 = {A.x ,ne};
+
+   int pom = -1;
+
+  for (int i = 0; i<n; i++)
+  {
+     int j = (i+1)%n;
+      
+     if(A.x > fmin(M[i].x,M[j].x) && A.x < fmax(M[i].x,M[j].x) && 
+        sekuSe(M[i], M[j], A, A1) == 1)
+        pom *=-1;
+  }
+  return pom;
+}
+
+int main()
+{
+  Tacka M[] = {{0, 0}, {4, 0}, {-4, 5}, {0, 4}, {0, 3}, {3, 2}};
+  //Tacka M[] = {{0, 0}, {2, 0}, {0, 2}};
+
+  int n = sizeof(M)/sizeof(M[0]);
+
+  Tacka A = {2,2};
+
+  if (tackaUMnogouglu(M, A,n)>0)
+    printf("Tacka se nalazi u mnogouglu");
+  else
+    printf("Tacka se ne nalazi u mnogouglu");
+  
+  return 0;
+}
