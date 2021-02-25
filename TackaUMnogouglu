@@ -58,7 +58,7 @@ int tackaUMnogouglu(Tacka M[], Tacka A,int n)
   if (n < 3)
     return 0;
     // "ne" predstavlja tacku koja ima najmanju vrednost y-a i sluzi pravljenju duzi AA1.
-    int ne;
+    int ne = 0;
     for(int k = 0; k < n; k++)
      {
        if(ne < M[k].y) ne = M[k].y;
@@ -69,7 +69,7 @@ int tackaUMnogouglu(Tacka M[], Tacka A,int n)
      // nalazi na stranici mnogougla.
     if(A.y == ne) 
     return -1;
-
+    
    //Tacka sa kojom A pravi duz koja je paralelna sa y osom.
    Tacka A1 = {A.x ,ne};
 
@@ -78,9 +78,14 @@ int tackaUMnogouglu(Tacka M[], Tacka A,int n)
   for (int i = 0; i<n; i++)
   {
      int j = (i+1)%n;
-      
+      if(A.x == M[i].x && A.y == M[i].y) 
+      {
+        return -1;
+        break;
+      }
      if(A.x > fmin(M[i].x,M[j].x) && A.x < fmax(M[i].x,M[j].x) && 
         sekuSe(M[i], M[j], A, A1) == 1)
+
         pom *=-1;
   }
   return pom;
@@ -88,13 +93,13 @@ int tackaUMnogouglu(Tacka M[], Tacka A,int n)
 
 int main()
 {
-  Tacka M[] = {{0, 0}, {4, 0}, {-4, 5}, {0, 4}, {0, 3}, {3, 2}};
+  Tacka M[] = {{0,0}, {4,0},{3,1},{3,4},{1,5},{1,3},{2,2}};
   //Tacka M[] = {{0, 0}, {2, 0}, {0, 2}};
-
+  
   int n = sizeof(M)/sizeof(M[0]);
 
-  Tacka A = {2,2};
-
+  Tacka A = {2,3};
+  
   if (tackaUMnogouglu(M, A,n)>0)
     printf("Tacka se nalazi u mnogouglu");
   else
@@ -102,3 +107,4 @@ int main()
   
   return 0;
 }
+
